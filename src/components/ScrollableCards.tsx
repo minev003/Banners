@@ -27,21 +27,36 @@ export default function ScrollableCards<T>(props: {
     }, [])
 
     const loadBanners = useCallback(async () => {
-        const newCards = await props.loadMore({ page, pageSize: 12 })
+
+        const pageToLoad = page + 1;
+        const newCards = await props.loadMore({ page: pageToLoad, pageSize: 12 })
+
         if (!newCards) {
             return
         }
-        let currentCards = [...cards]
+
         setPage(newCards.pageNumber)
         setHasMore(newCards.maxPageNumber > newCards.pageNumber)
+
         const newElements = newCards.content.map((value) => props.mapCard(value, deleteItem))
-        setCards([...currentCards, ...newElements])
-    }, [cards, page, deleteItem, props])
+
+
+        setCards((prevCardsState) => {
+            if (newCards.pageNumber === 0) {
+                const filteredPrevCards = prevCardsState.filter(card => !card.key?.toString().startsWith('skeleton-'));
+                return [...filteredPrevCards, ...newElements];
+            }
+
+            return [...prevCardsState, ...newElements];
+        });
+
+    }, [page, deleteItem, props])
 
     useEffect(() => {
-        if (page != 0) return
-        loadBanners().catch((reason) => console.error(reason))
-    }, [loadBanners, page])
+        if (page === 0) { // Изпълнява го само за първата страница
+            loadBanners().catch((reason) => console.error(reason))
+        }
+    }, [loadBanners])
 
     const loadMore = () => {
         loadBanners().catch((reason) => console.error(reason))

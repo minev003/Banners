@@ -32,7 +32,7 @@ class BannerService {
             content: banners,
             pageSize: page.pageSize,
             pageNumber: page.page,
-            maxPageNumber: total / page.pageSize,
+            maxPageNumber: Math.ceil(total / page.pageSize),
         } as PageResponse<BannerDto>
     }
 

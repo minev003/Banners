@@ -18,12 +18,12 @@ export default function Banners() {
                 loadMore={page => BannerService.getBanners(page)}
                 mapCard={(banner, deleteItem) => (
                     <BannerCard
-                        key={banner.id}
                         banner={banner}
                         delete={async () => {
                             deleteItem(banner.id!)
-                            BannerService.deleteBanner(banner.id!)
+                            await BannerService.deleteBanner(banner.id!)
                                 .catch((reason) => console.error(reason))
+                            deleteItem(banner.id!)
                         }}
                     />
                 )}
