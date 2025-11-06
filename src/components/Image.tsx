@@ -12,14 +12,15 @@ export default function Image(props: {
         if (props.url) {
             ImageService.fetchImage(props.url)
                 .then((value) => {
-                        if (value) {
-                            setImageSrc(value)
-                            setIsLoaded(true)
-                        }
-                    },
+                    if (value) {
+                        setImageSrc(value)
+                        setIsLoaded(true)
+                    }
+                },
                 )
         }
-    }, [props])
+        //url
+    }, [props.url])
 
     useEffect(() => {
         if (imageSrc) {
