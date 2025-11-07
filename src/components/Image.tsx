@@ -39,7 +39,6 @@ export default function Image(props: {
             >
                 <img
                     src={imageSrc}
-                    srcSet={`${imageSrc} 2x`}
                     style={{
                         ...(isLoaded ? {} : { visibility: 'hidden' }),
                         position: 'absolute',
@@ -52,6 +51,10 @@ export default function Image(props: {
                     }}
                     alt="Banner"
                     onLoad={() => setIsLoaded(true)}
+                    onError={() => {
+                        setImageSrc('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400"><rect width="100%" height="100%" fill="%23eee"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-family="Arial" font-size="20">No image</text></svg>')
+                        setIsLoaded(true)
+                    }}
                 />
             </Skeleton>
         </AspectRatio>

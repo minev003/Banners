@@ -11,7 +11,7 @@ export default function ScrollableCards<T>(props: {
 }) {
     const initial = [...Array(12)].map(props.skeletonMap)
     const [cards, setCards] = useState<React.JSX.Element[]>(initial)
-    const [page, setPage] = useState<number>(0)
+    const [page, setPage] = useState<number>(-1)
     const [hasMore, setHasMore] = useState<boolean>(true)
 
     const deleteItem = useCallback((id: string) => {
@@ -44,16 +44,22 @@ export default function ScrollableCards<T>(props: {
         setCards((prevCardsState) => {
             if (newCards.pageNumber === 0) {
                 const filteredPrevCards = prevCardsState.filter(card => !card.key?.toString().startsWith('skeleton-'));
-                return [...filteredPrevCards, ...newElements];
+                // Филтрираме дубликати и при първото зареждане
+                const existingKeys = new Set(filteredPrevCards.map(card => card.key?.toString()).filter(Boolean));
+                const uniqueNewElements = newElements.filter(element => !existingKeys.has(element.key?.toString()));
+                return [...filteredPrevCards, ...uniqueNewElements];
             }
 
-            return [...prevCardsState, ...newElements];
+            // Филтрираме дубликати - добавяме само карти с ключове, които още не съществуват
+            const existingKeys = new Set(prevCardsState.map(card => card.key?.toString()).filter(Boolean));
+            const uniqueNewElements = newElements.filter(element => !existingKeys.has(element.key?.toString()));
+            return [...prevCardsState, ...uniqueNewElements];
         });
 
     }, [page, deleteItem, props])
 
     useEffect(() => {
-        if (page === 0) { // Изпълнява го само за първата страница
+        if (page === -1) { // Изпълнява го само за първата страница
             loadBanners().catch((reason) => console.error(reason))
         }
     }, [loadBanners])
