@@ -15,6 +15,7 @@ export default function Banners() {
     return (
         <>
             <ScrollableCards
+                key={location.pathname}
                 loadMore={page => BannerService.getBanners(page)}
                 mapCard={(banner, deleteItem) => (
                     <BannerCard
