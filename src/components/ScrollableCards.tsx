@@ -3,6 +3,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import React, { useCallback, useEffect, useState } from 'react'
 import { PageRequest } from '../services/dto/page.request.ts'
 import { PageResponse } from '../services/dto/page.response.ts'
+import Box from '@mui/joy/Box'
 
 export default function ScrollableCards<T>(props: {
     loadMore: (page: PageRequest) => Promise<PageResponse<T> | undefined>
@@ -69,10 +70,7 @@ export default function ScrollableCards<T>(props: {
     }
 
     return (
-        <Grid
-            container
-            spacing={2}
-        >
+        <Grid>
             <InfiniteScroll
                 dataLength={cards.length}
                 next={loadMore}
@@ -85,7 +83,23 @@ export default function ScrollableCards<T>(props: {
                     </p>
                 }
             >
-                {...cards}
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: {
+                            xs: 'repeat(1, 1fr)',
+                            md: 'repeat(2, 1fr)',
+                            lg: 'repeat(3, 1fr)',
+                        },
+                        gap: 2,
+                    }}
+                >
+                    {cards.map((card, _index) => (
+                        <React.Fragment key={card.key}>
+                            {card}
+                        </React.Fragment>
+                    ))}
+                </Box>
             </InfiniteScroll>
         </Grid>
     )
