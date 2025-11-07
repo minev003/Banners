@@ -6,7 +6,12 @@ class BannerService {
     private readonly BANNER_KEY = 'banners'
 
     async createBanner(banner: BannerDto) {
-        this.saveBanners([banner, ...this.listBanners()])
+        if (!banner.id) {
+            banner.id = Date.now().toString(36) + Math.random().toString(36).substr(2)
+        }
+        const banners = this.listBanners()
+        banners.unshift(banner) // Добавяме в началото
+        this.saveBanners(banners)
     }
 
     async getBanners(page: PageRequest) {
@@ -41,11 +46,17 @@ class BannerService {
     }
 
     async updateBanner(id: string, banner: BannerDto) {
-        //todo update banner logic
+        const banners = this.listBanners()
+        const index = banners.findIndex(b => b.id === id)
+        if (index !== -1) {
+            banners[index] = { ...banner, id }
+            this.saveBanners(banners)
+        }
     }
-
     async deleteBanner(id: string) {
-        //todo delete banner logic
+        const banners = this.listBanners()
+        const filteredBanners = banners.filter(banner => banner.id !== id)
+        this.saveBanners(filteredBanners)
     }
 
     private listBanners() {

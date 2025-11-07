@@ -23,6 +23,10 @@ export default function App() {
                                 element={<Banners />}
                             />
                             <Route
+                                path="banners/new"
+                                element={<Banner />}
+                            />
+                            <Route
                                 path="banners/:id"
                                 element={<Banner />}
                             />
