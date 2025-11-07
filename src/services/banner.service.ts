@@ -6,12 +6,15 @@ class BannerService {
     private readonly BANNER_KEY = 'banners'
 
     async createBanner(banner: BannerDto) {
+
         if (!banner.id) {
-            banner.id = Date.now().toString(36) + Math.random().toString(36).substr(2)
+            banner.id = Date.now().toString(36) + Math.random().toString(36);
         }
-        const banners = this.listBanners()
-        banners.unshift(banner) // Добавяме в началото
-        this.saveBanners(banners)
+        const banners = this.listBanners();
+        banners.unshift(banner);
+        this.saveBanners(banners);
+
+        console.log(banner);
     }
 
     async getBanners(page: PageRequest) {

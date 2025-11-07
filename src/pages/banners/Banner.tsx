@@ -39,10 +39,10 @@ export default function Banner() {
             imageUrl: imageUrl,
         }
 
-        if (id === 'new') {
+        if (!id || id === 'new') {
             await BannerService.createBanner(banner)
         } else {
-            await BannerService.updateBanner(id!, banner)
+            await BannerService.updateBanner(id, banner)
         }
 
         setLoading(false)
@@ -62,7 +62,7 @@ export default function Banner() {
                 </FormControl>
 
                 <FormControl required sx={{ mb: 2 }}>
-                    <FormLabel>Image URL (optional)</FormLabel>
+                    <FormLabel>Image URL</FormLabel>
                     <Input
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
