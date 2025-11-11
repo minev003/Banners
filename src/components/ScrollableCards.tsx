@@ -44,14 +44,8 @@ export default function ScrollableCards<T>(props: {
 
         setCards((prevCardsState) => {
             if (newCards.pageNumber === 0) {
-                const filteredPrevCards = prevCardsState.filter(card => !card.key?.toString().startsWith('skeleton-'));
-                // Филтрираме дубликати и при първото зареждане
-                const existingKeys = new Set(filteredPrevCards.map(card => card.key?.toString()).filter(Boolean));
-                const uniqueNewElements = newElements.filter(element => !existingKeys.has(element.key?.toString()));
-                return [...filteredPrevCards, ...uniqueNewElements];
+                return newElements;
             }
-
-            // Филтрираме дубликати - добавяме само карти с ключове, които още не съществуват
             const existingKeys = new Set(prevCardsState.map(card => card.key?.toString()).filter(Boolean));
             const uniqueNewElements = newElements.filter(element => !existingKeys.has(element.key?.toString()));
             return [...prevCardsState, ...uniqueNewElements];
@@ -60,7 +54,7 @@ export default function ScrollableCards<T>(props: {
     }, [page, deleteItem, props])
 
     useEffect(() => {
-        if (page === -1) { // Изпълнява го само за първата страница
+        if (page === -1) {
             loadBanners().catch((reason) => console.error(reason))
         }
     }, [loadBanners])
@@ -76,12 +70,7 @@ export default function ScrollableCards<T>(props: {
                 next={loadMore}
                 hasMore={hasMore}
                 scrollableTarget="scroll"
-                loader={<h4>Loading...</h4>}
-                endMessage={
-                    <p style={{ textAlign: 'center' }}>
-                        <b>There are no more items available...</b>
-                    </p>
-                }
+                loader={<h4 style={{ gridColumn: '1 / -1', textAlign: 'center' }}>Loading...</h4>}
             >
                 <Box
                     sx={{
@@ -104,3 +93,4 @@ export default function ScrollableCards<T>(props: {
         </Grid>
     )
 }
+
