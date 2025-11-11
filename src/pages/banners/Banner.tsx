@@ -1,9 +1,10 @@
-import { FormControl, FormLabel, Input, Button, Box } from '@mui/joy'
+import { FormControl, FormLabel, Input, Button, Box, FormHelperText } from '@mui/joy'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { usePageData } from '../../context/page-data/page-data.context.ts'
 import BannerService from '../../services/banner.service.ts'
 import { BannerDto } from '../../services/dto/banner.dto.ts'
+
 
 export default function Banner() {
     const { id } = useParams()
@@ -13,6 +14,10 @@ export default function Banner() {
     const [link, setLink] = useState('')
     const [imageUrl, setImageUrl] = useState('')
     const [loading, setLoading] = useState(false)
+
+    // states for error messages
+    const [linkError, setLinkError] = useState('')
+    const [imageUrlError, setImageUrlError] = useState('')
 
     useEffect(() => {
         if (id === 'new') {
@@ -32,6 +37,34 @@ export default function Banner() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        let isValid = true
+
+        setLinkError('')
+        setImageUrlError('')
+
+        if (!link.trim()) {
+            setLinkError('Link field is required.')
+            isValid = false
+        } else if (!link.includes('http')) {
+            setLinkError('Link must include "http" or "https".')
+            isValid = false
+        }
+
+        if (!imageUrl.trim()) {
+            setImageUrlError('Image URL field is required.')
+            isValid = false
+        } else if (!imageUrl.includes('http')) {
+            setImageUrlError('Image URL must include "http" or "https"')
+            isValid = false
+        }
+
+        // If the form is not validstop execution.
+        if (!isValid) {
+            setLoading(false)
+            return
+        }
+
         setLoading(true)
 
         const banner: BannerDto = {
@@ -39,35 +72,43 @@ export default function Banner() {
             imageUrl: imageUrl,
         }
 
-        if (!id || id === 'new') {
-            await BannerService.createBanner(banner)
-        } else {
-            await BannerService.updateBanner(id, banner)
+        try {
+            if (!id || id === 'new') {
+                await BannerService.createBanner(banner)
+            } else {
+                await BannerService.updateBanner(id, banner)
+            }
+            navigate('/banners')
+        } catch (error) {
+            console.error('API Error:', error)
+        } finally {
+            setLoading(false)
         }
-
-        setLoading(false)
-        navigate('/banners')
     }
 
     return (
         <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
             <form onSubmit={handleSubmit}>
-                <FormControl required sx={{ mb: 2 }}>
+                <FormControl required sx={{ mb: 2 }} error={!!linkError}>
                     <FormLabel>Link</FormLabel>
                     <Input
                         value={link}
                         onChange={(e) => setLink(e.target.value)}
-                        placeholder="test"
+                        placeholder="e.g. https://example.com"
+                        error={!!linkError}
                     />
+                    {linkError && <FormHelperText>{linkError}</FormHelperText>}
                 </FormControl>
 
-                <FormControl required sx={{ mb: 2 }}>
+                <FormControl required sx={{ mb: 2 }} error={!!imageUrlError}>
                     <FormLabel>Image URL</FormLabel>
                     <Input
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
-                        placeholder="test"
+                        placeholder="e.g. https://example.com/image.jpg"
+                        error={!!imageUrlError}
                     />
+                    {imageUrlError && <FormHelperText>{imageUrlError}</FormHelperText>}
                 </FormControl>
 
                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

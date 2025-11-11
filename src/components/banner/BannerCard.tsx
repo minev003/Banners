@@ -1,5 +1,5 @@
 import { BannerDto } from '../../services/dto/banner.dto.ts'
-import { Button, Card, CardActions, CardOverflow, Grid, Skeleton, Typography } from '@mui/joy'
+import { Button, Card, CardActions, CardOverflow, Skeleton, Typography } from '@mui/joy'
 import Box from '@mui/joy/Box'
 import IconButton from '@mui/joy/IconButton'
 import { Delete } from '@mui/icons-material'
@@ -15,73 +15,91 @@ export default function BannerCard(props: { banner?: BannerDto; delete?: () => v
     return (
         <>
             <Card
+                component="a"
+                href={props.banner?.link}
+                target="_blank"
+                rel="noopener noreferrer"
                 sx={{
                     height: 400,
                     width: '100%',
                     minWidth: 280,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    transition: '0.3s',
+                    overflow: 'hidden',
+                    '&:hover': {
+                        boxShadow: 'xl',
+                        translate: '0 -4px',
+                    },
                 }}
             >
                 <CardOverflow>
                     <Image url={props.banner?.imageUrl} />
                 </CardOverflow>
-                <Box>
-                    <Box
+
+                <Box sx={{ flexGrow: 1, p: 2 }}>
+                    <Typography
+                        level="title-lg"
                         sx={{
-                            display: 'flex',
-                            gap: 2,
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            width: '100%',
+
                         }}
                     >
-                        <Typography
-                            level="title-lg"
-                            sx={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                width: '100%',
-                            }}
+                        <Skeleton
+                            loading={!props.banner}
+                            variant="text"
+                            sx={{ width: '100%', height: '100%' }}
                         >
-                            <Skeleton
-                                loading={!props.banner}
-                                variant="text"
-                                sx={{ width: '100%', height: '100%' }}
-                            >
-                                {props.banner?.link}
-                            </Skeleton>
-                        </Typography>
-                    </Box>
+                            {props.banner?.link}
+                        </Skeleton>
+                    </Typography>
                 </Box>
-                <CardActions>
+
+                <CardActions
+                    onClick={(e) => e.stopPropagation()}
+                    sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}
+                >
                     <IconButton
                         variant="outlined"
                         size="sm"
-                        sx={{ width: '20%', alignSelf: 'center' }}
-                        onClick={() => setShowDeleteModal(true)}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setShowDeleteModal(true)
+                        }}
                     >
                         <Delete />
                     </IconButton>
+
                     <Button
                         variant="solid"
-                        type={'button'}
+                        type="button"
                         size="md"
-                        onClick={() => navigate({ pathname: `/banners/${props.banner!.id}` })}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            navigate(`/banners/${props.banner!.id}`)
+                        }}
                         color="primary"
-                        sx={{ width: '75%', alignSelf: 'center', fontWeight: 600 }}
+                        sx={{ fontWeight: 600 }}
                     >
                         Edit
                     </Button>
                 </CardActions>
             </Card>
+
             {props.banner && (
                 <ConfirmModal
                     open={showDeleteModal}
                     onClose={() => setShowDeleteModal(false)}
                     confirm={() => {
                         setShowDeleteModal(false)
-                        if (props.delete) {
-                            props.delete()
-                        }
+                        if (props.delete) props.delete()
                     }}
                     action="delete this banner"
                 />
